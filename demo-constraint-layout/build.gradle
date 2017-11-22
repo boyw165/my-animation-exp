@@ -52,15 +52,18 @@ dependencies {
     implementation rootProject.ext.dep.supportMultidex
 
     // RxKotlin.
-    compile rootProject.ext.dep.rxKotlin
+    implementation rootProject.ext.dep.rxKotlin
     // Rx-Java.
-    compile rootProject.ext.dep.rxJava
-    compile rootProject.ext.dep.rxAndroid
+    implementation rootProject.ext.dep.rxJava
+    implementation rootProject.ext.dep.rxAndroid
     // Rx-Binding.
-    compile rootProject.ext.dep.rxBinding
-    compile rootProject.ext.dep.rxBindingRecyclerViewV7
+    implementation rootProject.ext.dep.rxBinding
+    implementation rootProject.ext.dep.rxBindingRecyclerViewV7
     // Rx-Permissions.
-    compile rootProject.ext.dep.rxPermissions
+    implementation rootProject.ext.dep.rxPermissions
+
+    // RecyclerView plugins.
+    implementation rootProject.ext.dep.airbnbEpoxy
 
     testImplementation rootProject.ext.dep.testJunit
 
