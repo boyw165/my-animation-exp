@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Animation Exp</string>
+    <string name="btn_animate">animate</string>
+</resources>
