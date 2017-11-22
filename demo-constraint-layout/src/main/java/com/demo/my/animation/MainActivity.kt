@@ -1,10 +1,10 @@
 package com.demo.my.animation
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.transition.TransitionManager
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -14,7 +14,6 @@ import com.demo.my.animation.view.MyEpoxyController
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     val mFooPicker by lazy { findViewById<RecyclerView>(R.id.foo_picker) }
 
     // Animation.
-    var mIsForwardAnimation: Boolean = true
+    var mIsFolded: Boolean = true
 
     var mBottomViewController: EpoxyController? = null
 
@@ -35,7 +34,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main_folded)
+        // Restore the previous saved state before determine what layout to use.
+        mIsFolded = savedInstanceState?.getBoolean("mIsFolded") ?: false
+
+        setContentView(getLayoutId())
 
         mBottomViewController = MyEpoxyController(15)
         mFooPicker.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -56,35 +58,55 @@ class MainActivity : AppCompatActivity() {
                 .clicks(mBtnAnimate)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                               if (mIsForwardAnimation) {
-                                   mIsForwardAnimation = false
-                                   animateForward()
-                               } else {
-                                   mIsForwardAnimation = true
-                                   animateBackward()
-                               }
-                           }))
+                    if (mIsFolded) {
+                        mIsFolded = false
+                        unfold()
+                    } else {
+                        mIsFolded = true
+                        fold()
+                    }
+                }))
     }
 
     override fun onPause() {
         super.onPause()
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+
+        outState!!.putBoolean("mIsFolded", mIsFolded)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        mIsFolded = savedInstanceState!!.getBoolean("mIsFolded")
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Protected / Private Methods ////////////////////////////////////////////
 
-    protected fun animateForward() {
+    protected fun getLayoutId(): Int {
+        return if (mIsFolded) {
+            R.layout.activity_main_folded
+        } else {
+            R.layout.activity_main_unfolded
+        }
+    }
+
+    protected fun unfold() {
         val set1 = ConstraintSet()
         set1.clone(mLayout)
 
         val set2 = ConstraintSet()
-        set2.clone(this@MainActivity, R.layout.activity_main_expanded)
+        set2.clone(this@MainActivity, R.layout.activity_main_unfolded)
 
         TransitionManager.beginDelayedTransition(mLayout)
         set2.applyTo(mLayout)
     }
 
-    protected fun animateBackward() {
+    protected fun fold() {
         val set1 = ConstraintSet()
         set1.clone(mLayout)
 
